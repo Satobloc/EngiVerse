@@ -29,17 +29,20 @@ def decode_firmware_strings(data: bytes, min_length: int = 4, include_utf16le: b
     rows = list(printable_runs(data, min_length))
     if include_utf16le:
         start, chars = None, []
-        for i in range(0, len(data)-1, 2):
-            code = data[i] | (data[i+1] << 8)
-            if 0x20 <= code <= 0x7E:
-                if start is None: start = i
-                chars.append(chr(code))
-            else:
-                if start is not None and len(chars) >= min_length:
-                    rows.append({"offset":start,"length":len(chars)*2,"encoding":"utf-16le","text":"".join(chars)})
-                start, chars = None, []
-        if start is not None and len(chars) >= min_length:
-            rows.append({"offset":start,"length":len(chars)*2,"encoding":"utf-16le","text":"".join(chars)})
+        # Try both byte alignments. UTF-16LE strings can begin at odd offsets.
+        for alignment in (0, 1):
+            start, chars = None, []
+            for i in range(alignment, len(data)-1, 2):
+                code = data[i] | (data[i+1] << 8)
+                if 0x20 <= code <= 0x7E:
+                    if start is None: start = i
+                    chars.append(chr(code))
+                else:
+                    if start is not None and len(chars) >= min_length:
+                        rows.append({"offset":start,"length":len(chars)*2,"encoding":"utf-16le","text":"".join(chars)})
+                    start, chars = None, []
+            if start is not None and len(chars) >= min_length:
+                rows.append({"offset":start,"length":len(chars)*2,"encoding":"utf-16le","text":"".join(chars)})
     return sorted(rows, key=lambda r:(r["offset"],r["encoding"]))
 
 def parse_intel_hex_line(line: str, line_number: int):

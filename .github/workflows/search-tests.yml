@@ -5,7 +5,9 @@ on:
     branches: [main]
     paths:
       - "tools/engiverse_search.py"
+      - "tools/engiverse_extract.py"
       - "tests/**"
+      - "TOOLS/EXTRACT/**"
       - ".github/workflows/search-tests.yml"
   pull_request:
     paths:

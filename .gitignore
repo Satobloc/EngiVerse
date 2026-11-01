@@ -1,0 +1,12 @@
+# Generated local search indexes and temporary rebuild files
+indexes/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.tmp
+
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
+.venv/
+venv/
